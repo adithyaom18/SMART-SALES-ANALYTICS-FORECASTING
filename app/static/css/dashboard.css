@@ -92,3 +92,12 @@ body {
         transform: translateY(0);
     }
 }
+
+.kpi-icon {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+
+#loadingSpinner {
+    min-height: 120px;
+}

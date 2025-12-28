@@ -2,90 +2,48 @@ import pandas as pd
 import numpy as np
 import joblib
 
+# Load trained model once
 model = joblib.load("models/sales_forecast_model.pkl")
 
-df = pd.read_csv("data/processed/forecast_data.csv")
 
-df["Order Date"] = pd.to_datetime(df["Order Date"])
+# --------------------------------------------------
+# INTERNAL HELPER: Load & Prepare Monthly Data
+# --------------------------------------------------
+def _load_monthly_data(active_dataset_path=None):
+
+    if active_dataset_path:
+        df = pd.read_csv(active_dataset_path)
+    else:
+        df = pd.read_csv("data/raw/Super store Sales.csv")
+
+    df["Order Date"] = pd.to_datetime(df["Order Date"], errors="coerce")
+
+    monthly = (
+        df
+        .set_index("Order Date")
+        .resample("M")["Sales"]
+        .sum()
+        .reset_index()
+    )
+
+    # Feature engineering
+    monthly["month"] = monthly["Order Date"].dt.month
+    monthly["year"] = monthly["Order Date"].dt.year
+    monthly["lag_1"] = monthly["Sales"].shift(1)
+    monthly["lag_3"] = monthly["Sales"].shift(3)
+    monthly["rolling_3_mean"] = monthly["Sales"].rolling(3).mean()
+
+    monthly = monthly.dropna().reset_index(drop=True)
+
+    return monthly
 
 
-'''
+# --------------------------------------------------
+# FORECAST FUTURE SALES
+# --------------------------------------------------
+def get_forecast(active_dataset_path=None, forecast_horizon=3):
 
-Predict future monthly sales
-
-Use last known history
-
-Handle lag features correctly
-
-Make it reusable for Flask later
-
- Key Concept
-
-Forecasting with lag features requires recursive prediction
-
-'''
-
-# Sort data to ensure correct order
-df = df.sort_values("Order Date").reset_index(drop=True)
-
-#Now extract the last known values:
-last_row = df.iloc[-1]
-
-last_sales = last_row["Sales"]
-last_lag_1 = last_row["lag_1"]
-last_lag_3 = last_row["lag_3"]
-last_rolling = last_row["rolling_3_mean"]
-
-last_date = pd.to_datetime(last_row["Order Date"])
-
-#Decide Forecast Horizon - 3 months
-forecast_horizon = 3
-
-#Create Empty List to Store Predictions
-future_predictions = []
-future_dates = []
-
-#Recursive Forecast Loop
-for i in range(forecast_horizon):
-    next_month = last_date + pd.DateOffset(months=1)
-
-    month = next_month.month
-    year = next_month.year
-
-    input_features = pd.DataFrame([{
-        "month": month,
-        "year": year,
-        "lag_1": last_sales,
-        "lag_3": last_lag_3,
-        "rolling_3_mean": last_rolling
-    }])
-
-    predicted_sales = model.predict(input_features)[0]
-
-    future_predictions.append(predicted_sales)
-    future_dates.append(next_month)
-
-    # Update values for next iteration
-    last_lag_3 = last_lag_1
-    last_lag_1 = last_sales
-    last_sales = predicted_sales
-    last_rolling = np.mean([last_lag_1, last_lag_3, predicted_sales])
-    last_date = next_month
-
-#Create Forecast DataFrame
-
-forecast_df = pd.DataFrame({
-    "Order Date": future_dates,
-    "Predicted Sales": future_predictions
-})
-
-forecast_df
-
-print(forecast_df)
-
-def get_forecast(forecast_horizon=3):
-    df_local = df.copy()
-
+    df_local = _load_monthly_data(active_dataset_path)
     df_local = df_local.sort_values("Order Date").reset_index(drop=True)
 
     last_row = df_local.iloc[-1]
@@ -94,7 +52,7 @@ def get_forecast(forecast_horizon=3):
     last_lag_1 = last_row["lag_1"]
     last_lag_3 = last_row["lag_3"]
     last_rolling = last_row["rolling_3_mean"]
-    last_date = pd.to_datetime(last_row["Order Date"])
+    last_date = last_row["Order Date"]
 
     future_predictions = []
     future_dates = []
@@ -115,6 +73,7 @@ def get_forecast(forecast_horizon=3):
         future_predictions.append(round(predicted_sales, 2))
         future_dates.append(next_month.strftime("%Y-%m-%d"))
 
+        # Recursive update
         last_lag_3 = last_lag_1
         last_lag_1 = last_sales
         last_sales = predicted_sales
@@ -126,16 +85,20 @@ def get_forecast(forecast_horizon=3):
         "predicted_sales": future_predictions
     }
 
-def get_actual_vs_predicted(last_n_months=6):
-    df_local = df.copy()
+
+# --------------------------------------------------
+# ACTUAL vs PREDICTED (MODEL EVALUATION)
+# --------------------------------------------------
+def get_actual_vs_predicted(active_dataset_path=None, last_n_months=6):
+
+    df_local = _load_monthly_data(active_dataset_path)
     df_local = df_local.sort_values("Order Date").reset_index(drop=True)
 
-    # Take last N rows
     actual_df = df_local.tail(last_n_months)
 
-    X_actual = actual_df.drop(columns=["Order Date", "Sales"])
+    X_actual = actual_df[["month", "year", "lag_1", "lag_3", "rolling_3_mean"]]
     actual_sales = actual_df["Sales"].values
-    dates = pd.to_datetime(actual_df["Order Date"]).dt.strftime("%Y-%m-%d").values
+    dates = actual_df["Order Date"].dt.strftime("%Y-%m-%d").values
 
     predicted_sales = model.predict(X_actual)
 
@@ -145,48 +108,77 @@ def get_actual_vs_predicted(last_n_months=6):
         "predicted_sales": predicted_sales.round(2).tolist()
     }
 
-def get_kpis():
-    # Load RAW data for analytics
-    raw_df = pd.read_csv("data/raw/Super store Sales.csv")
 
-    raw_df["Order Date"] = pd.to_datetime(raw_df["Order Date"], dayfirst=True)
+# --------------------------------------------------
+# KPIs
+# --------------------------------------------------
+def get_kpis(active_dataset_path=None):
 
-    # Total Sales
-    total_sales = round(raw_df["Sales"].sum(), 2)
+    if active_dataset_path:
+        df = pd.read_csv(active_dataset_path)
+    else:
+        df = pd.read_csv("data/raw/Super store Sales.csv")
 
-    # Monthly aggregation
+    df["Order Date"] = pd.to_datetime(df["Order Date"], errors="coerce")
+    df = df.dropna(subset=["Order Date", "Sales"])
+
     monthly_sales = (
-        raw_df
+        df
         .set_index("Order Date")
         .resample("M")["Sales"]
         .sum()
+        .reset_index()
     )
 
-    avg_monthly_sales = round(monthly_sales.mean(), 2)
+    if monthly_sales.empty:
+        return {
+            "total_sales": 0,
+            "avg_monthly_sales": 0,
+            "peak_month": "N/A",
+            "growth_pct": 0,
+            "data_coverage": 0
+        }
 
-    # Best Category
-    best_category = (
-        raw_df
-        .groupby("Category")["Sales"]
-        .sum()
-        .idxmax()
-    )
+    total_sales = monthly_sales["Sales"].sum()
+    avg_monthly_sales = monthly_sales["Sales"].mean()
 
-    # Peak Month
-    peak_month = monthly_sales.idxmax().strftime("%B %Y")
+    peak_idx = monthly_sales["Sales"].idxmax()
+    peak_month = monthly_sales.loc[peak_idx]["Order Date"].strftime("%B %Y")
 
+    if len(monthly_sales) >= 2 and monthly_sales.iloc[-2]["Sales"] != 0:
+        last = monthly_sales.iloc[-1]["Sales"]
+        prev = monthly_sales.iloc[-2]["Sales"]
+        growth_pct = ((last - prev) / prev) * 100
+    else:
+        growth_pct = 0
+
+    data_coverage = len(monthly_sales)
+
+    # ✅ Convert ALL values to native Python types
     return {
-        "total_sales": total_sales,
-        "avg_monthly_sales": avg_monthly_sales,
-        "best_category": best_category,
-        "peak_month": peak_month
+        "total_sales": float(round(total_sales, 2)),
+        "avg_monthly_sales": float(round(avg_monthly_sales, 2)),
+        "peak_month": str(peak_month),
+        "growth_pct": float(round(growth_pct, 2)),
+        "data_coverage": int(data_coverage)
     }
 
-def get_analytics_data():
-    raw_df = pd.read_csv("data/raw/Super store Sales.csv")
-    raw_df["Order Date"] = pd.to_datetime(raw_df["Order Date"], dayfirst=True)
 
-    # Monthly Sales
+# --------------------------------------------------
+# ANALYTICS DATA
+# --------------------------------------------------
+def get_analytics_data(active_dataset_path=None):
+
+    if active_dataset_path:
+        raw_df = pd.read_csv(active_dataset_path)
+    else:
+        raw_df = pd.read_csv("data/raw/Super store Sales.csv")
+
+    raw_df["Order Date"] = pd.to_datetime(raw_df["Order Date"], errors="coerce")
+
+    response = {}
+
+    # Monthly sales (always exists)
     monthly = (
         raw_df
         .set_index("Order Date")
@@ -195,34 +187,26 @@ def get_analytics_data():
         .reset_index()
     )
 
-    # Category Sales
-    category_sales = (
-        raw_df
-        .groupby("Category")["Sales"]
-        .sum()
-        .sort_values(ascending=False)
-    )
-
-    # Region Sales
-    region_sales = (
-        raw_df
-        .groupby("Region")["Sales"]
-        .sum()
-    )
-
-    return {
-        "monthly": {
-            "dates": monthly["Order Date"].dt.strftime("%Y-%m").tolist(),
-            "sales": monthly["Sales"].round(2).tolist()
-        },
-        "category": {
-            "labels": category_sales.index.tolist(),
-            "sales": category_sales.round(2).tolist()
-        },
-        "region": {
-            "labels": region_sales.index.tolist(),
-            "sales": region_sales.round(2).tolist()
-        }
+    response["monthly"] = {
+        "dates": monthly["Order Date"].dt.strftime("%Y-%m").tolist(),
+        "sales": monthly["Sales"].round(2).tolist()
     }
 
+    # Category-wise (optional)
+    if "Category" in raw_df.columns:
+        category = raw_df.groupby("Category")["Sales"].sum().reset_index()
+        response["category"] = {
+            "labels": category["Category"].tolist(),
+            "sales": category["Sales"].round(2).tolist()
+        }
+
+    # Region-wise (optional)
+    if "Region" in raw_df.columns:
+        region = raw_df.groupby("Region")["Sales"].sum().reset_index()
+        response["region"] = {
+            "labels": region["Region"].tolist(),
+            "sales": region["Sales"].round(2).tolist()
+        }
+
+    return response
 

@@ -10,12 +10,12 @@ fetch("/evaluation")
                 labels: data.dates,
                 datasets: [
                     {
-                        label: "Actual Sales",
+                        label: "Historical Sales",
                         data: data.actual_sales,
                         borderWidth: 2
                     },
                     {
-                        label: "Predicted Sales",
+                        label: "Forecasted Trend",
                         data: data.predicted_sales,
                         borderWidth: 2
                     }

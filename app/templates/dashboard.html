@@ -21,12 +21,31 @@
 
         <!-- PAGE TITLE -->
         <h3 class="text-center mb-2 page-title">
-            📊 Sales Analytics & Model Evaluation
+            📊 Sales Analytics & Forecasting Insights
         </h3>
+
+        <!-- DATASET BADGE -->
+        <div class="text-center mb-3">
+            <span id="datasetBadge" class="badge bg-primary px-3 py-2">
+                Loading dataset...
+            </span>
+        </div>
 
         <p class="text-center text-muted mb-4">
             KPI-driven analytics and machine learning based sales forecasting
         </p>
+
+        <div class="text-center mb-3">
+            <a href="/reset-dataset" class="btn btn-outline-secondary btn-sm">
+                🔄 Reset to Default Dataset
+            </a>
+        </div>
+
+        <!-- LOADING SPINNER -->
+        <div id="loadingSpinner" class="text-center my-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2">Loading dashboard...</p>
+        </div>
 
         <!-- KPI CARDS -->
         <div class="row page-spacing" id="kpiCards">
@@ -71,7 +90,14 @@
             <div class="col-12">
                 <div class="card shadow chart-card">
                     <div class="card-body">
-                        <h6>Model Evaluation (Actual vs Predicted)</h6>
+                        <h6 class="fw-bold">
+                            Forecast Trend vs Historical Sales
+                        </h6>
+                        <p class="text-muted mb-2" style="font-size: 0.85rem;">
+                            Forecasted values represent trend direction and magnitude, not exact historical point
+                            predictions.
+                        </p>
+
                         <canvas id="evaluationChart" height="120"></canvas>
                     </div>
                 </div>
@@ -84,6 +110,7 @@
     <script src="{{ url_for('static', filename='js/kpis.js') }}"></script>
     <script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
     <script src="{{ url_for('static', filename='js/evaluation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataset.js') }}"></script>
 
 </body>
 

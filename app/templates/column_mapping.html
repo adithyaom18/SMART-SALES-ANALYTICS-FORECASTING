@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Column Mapping</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-5" style="max-width: 700px;">
+
+        <div class="card shadow p-4">
+
+            <h3 class="text-center mb-3">
+                🧩 Column Mapping
+            </h3>
+
+            <p class="text-center text-muted mb-4">
+                Select the columns corresponding to Date and Sales
+            </p>
+
+            <form action="/map-columns" method="POST">
+
+                <input type="hidden" name="filename" value="{{ filename }}">
+
+                <!-- DATE COLUMN -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Date Column</label>
+                    <select name="date_column" class="form-select" required>
+                        {% for col in columns %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- SALES COLUMN -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Sales Column</label>
+                    <select name="sales_column" class="form-select" required>
+                        {% for col in columns %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- CATEGORY COLUMN (OPTIONAL) -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">
+                        Category Column <span class="text-muted">(optional)</span>
+                    </label>
+                    <select name="category_column" class="form-select">
+                        <option value="">-- Not Available --</option>
+                        {% for col in columns %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- REGION COLUMN (OPTIONAL) -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        Region Column <span class="text-muted">(optional)</span>
+                    </label>
+                    <select name="region_column" class="form-select">
+                        <option value="">-- Not Available --</option>
+                        {% for col in columns %}
+                        <option value="{{ col }}">{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Confirm Mapping
+                </button>
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
