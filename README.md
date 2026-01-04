@@ -151,17 +151,14 @@ Optional:
 
 📦 Installation
 1️⃣ Create a Virtual Environment (using venv)
-python -m venv sales
+conda create -n sales311 python=3.11
+
 
 Activate the virtual environment:
 
 Windows
 
-sales\Scripts\activate
-
-macOS / Linux
-
-source sales/bin/activate
+conda activate sales311
 
 2️⃣ Install Dependencies
 pip install -r requirements.txt
