@@ -1,4 +1,13 @@
 📊 Smart Sales Analytics & Forecasting System
+
+[![Live](https://img.shields.io/badge/Live-Demo-brightgreen)](https://smart-sales-analytics-forecasting.onrender.com)
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Flask](https://img.shields.io/badge/Flask-Framework-lightgrey?logo=flask)
+![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-yellow?logo=pandas)
+![Chart.js](https://img.shields.io/badge/Chart.js-Visualizations-orange?logo=chartdotjs)
+![Render](https://img.shields.io/badge/Render-Deployed-success?logo=render)
+
+
 🧠 Overview
 
 Smart Sales Analytics & Forecasting System is a full-stack, machine learning–powered web application built using Flask, Pandas, and Chart.js.
@@ -191,3 +200,4 @@ It should not be used directly for business-critical financial decisions without
 🔗 GitHub: https://github.com/adithyaom18
 
 🔗 LinkedIn: https://www.linkedin.com/in/k-adithya-om
+
