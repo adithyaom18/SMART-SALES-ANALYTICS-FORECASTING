@@ -10,22 +10,22 @@
 ## 📸 Screenshots
 
 ### Index Page
-<img src="images/dashboard.png" alt="Index Page" width="600">
+<img src="images/dashboard.png" alt="Index Page" >
 
 ### Column Mapping
-<img src="images/columnmapping.png" alt="Column Mapping" width="600">
+<img src="images/columnmapping.png" alt="Column Mapping" >
 
 ### Dashboard
-<img src="images/dashboard.png" alt="Dashboard" width="600">
+<img src="images/dashboard.png" alt="Dashboard" >
 
 ### Monthly Sales Trend and Sales By Region
-<img src="images/visual.png" alt="Monthly Sales Trend and Sales By Region" width="600">
+<img src="images/visual.png" alt="Monthly Sales Trend and Sales By Region">
 
 ### Sales By Category
-<img src="images/sales.png" alt="Sales By Category" width="600">
+<img src="images/sales.png" alt="Sales By Category">
 
 ### Forecast Trend VS Historical Sales
-<img src="images/trendline.png" alt="Forecast Trend VS Historical Sales" width="600">
+<img src="images/trendline.png" alt="Forecast Trend VS Historical Sales">
 
 
 
