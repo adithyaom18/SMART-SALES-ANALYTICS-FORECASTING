@@ -1,4 +1,4 @@
-📊 Smart Sales Analytics & Forecasting System
+## 📊 Smart Sales Analytics & Forecasting System
 
 [![Live](https://img.shields.io/badge/Live-Demo-brightgreen)](https://smart-sales-analytics-forecasting.onrender.com)
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
@@ -6,6 +6,27 @@
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-yellow?logo=pandas)
 ![Chart.js](https://img.shields.io/badge/Chart.js-Visualizations-orange?logo=chartdotjs)
 ![Render](https://img.shields.io/badge/Render-Deployed-success?logo=render)
+
+## 📸 Screenshots
+
+### Index Page
+<img src="images/dashboard.png" alt="Index Page" width="600">
+
+### Column Mapping
+<img src="images/columnmapping.png" alt="Column Mapping" width="600">
+
+### Dashboard
+<img src="images/dashboard.png" alt="Dashboard" width="600">
+
+### Monthly Sales Trend and Sales By Region
+<img src="images/visual.png" alt="Monthly Sales Trend and Sales By Region" width="600">
+
+### Sales By Category
+<img src="images/sales.png" alt="Sales By Category" width="600">
+
+### Forecast Trend VS Historical Sales
+<img src="images/trendline.png" alt="Forecast Trend VS Historical Sales" width="600">
+
 
 
 🧠 Overview
@@ -158,23 +179,25 @@ Optional:
 
 📌 Column names do not need to match predefined names — mapping is handled via UI.
 
-📦 Installation
-1️⃣ Create a Virtual Environment (using venv)
+📦 Installation: 
+
+1️⃣ Create a Virtual Environment (using conda)
+```bash
 conda create -n sales311 python=3.11
-
-
+```
 Activate the virtual environment:
-
-Windows
-
+```bash
 conda activate sales311
-
+```
 2️⃣ Install Dependencies
+```bash
 pip install -r requirements.txt
-
+```
 💻 Usage
 Run the Flask Application
+```bash
 python run.py
+```
 
 What You Can Do
 
