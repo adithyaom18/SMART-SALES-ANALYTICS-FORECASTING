@@ -21,12 +21,6 @@ __pycache__/
 # ===============================
 # Dataset Files (Avoid Large Files)
 # ===============================
-data/raw/
-data/processed/
-data/
-uploads/
-*.csv
-*.xlsx
 
 
 # ===============================
